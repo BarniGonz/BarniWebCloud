@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARNI SAN - Global Cloud Drive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 95%;
+            max-width: 1200px;
+            min-height: 90vh;
+        }
+
+        .logo h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradientText 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        @keyframes gradientText {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .toggle-btn {
+            background: none;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: underline;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .upload-area.dragover {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .upload-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            width: auto;
+            padding: 15px 40px;
+            margin: 10px;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            height: 25px;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 15px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* NEW: Download Progress Styles */
+        .download-progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .download-progress-modal {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            color: white;
+        }
+
+        .download-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: downloadPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes downloadPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .download-filename {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            word-break: break-word;
+        }
+
+        .download-details {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .download-progress-bar {
+            width: 100%;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .download-progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 200% 200%;
+            animation: progressShimmer 2s ease-in-out infinite;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        @keyframes progressShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .download-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .download-speed {
+            color: #4ecdc4;
+            font-weight: 600;
+        }
+
+        .download-eta {
+            color: #f093fb;
+            font-weight: 600;
+        }
+
+        .cancel-download-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-right: 20px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .file-meta {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        .share-link-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .share-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            width: auto;
+            padding: 10px 20px;
+            margin: 0;
+            font-size: 14px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #45b7d1, #96ceb4);
+        }
+
+        .download-btn.downloading {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            animation: downloadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes downloadingPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(240, 147, 251, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(240, 147, 251, 0); }
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            color: #ffcccb;
+        }
+
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #b8f2e6;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+
+        .logout-btn {
+            width: auto;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #f5576c, #f093fb);
+            margin: 10px auto;
+            display: block;
+        }
+
+        .shared-file-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .shared-file-icon {
+            font-size: 5rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .shared-file-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .shared-file-details {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 35px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .download-shared-btn {
+            width: auto;
+            padding: 20px 50px;
+            font-size: 18px;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            margin: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-shared-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-to-app-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 30px;
+            margin: 15px;
+            text-decoration: none;
+            border-radius: 15px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            font-size: 1.2rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container, .main-container, .shared-file-container {
+                margin: 10px;
+                padding: 25px;
+                width: 95%;
+            }
+            
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .download-progress-modal {
+                padding: 25px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Download Progress Overlay -->
+    <div id="download-progress-overlay" class="download-progress-overlay hidden">
+        <div class="download-progress-modal">
+            <div class="download-icon" id="download-modal-icon">📥</div>
+            <div class="download-filename" id="download-modal-filename">Downloading...</div>
+            <div class="download-details" id="download-modal-details">Preparing download...</div>
+            
+            <div class="download-progress-bar">
+                <div class="download-progress-fill" id="download-modal-progress"></div>
+            </div>
+            
+            <div class="download-stats">
+                <span class="download-speed" id="download-modal-speed">0 KB/s</span>
+                <span id="download-modal-percentage">0%</span>
+                <span class="download-eta" id="download-modal-eta">Calculating...</span>
+            </div>
+            
+            <button class="cancel-download-btn" id="cancel-download-btn" onclick="cancelDownload()">
+                ❌ Cancel Download
+            </button>
+        </div>
+    </div>
+
+    <!-- Shared File Access Page -->
+    <div id="shared-file-page" class="shared-file-container hidden">
+        <div class="logo">
+            <h1>BARNI SAN</h1>
+        </div>
+        <div id="shared-file-content">
+            <!-- Content will be dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="container">
+        <div class="logo">
+            <h1>BARNI SAN</h1>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600;">Welcome Back!</h2>
+            <div id="login-messages"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                <button type="button" class="toggle-btn" onclick="toggleForms()">Don't have an account? Sign up</button>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="hidden">
+            <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600;">Join BARNI SAN!</h2>
+            <div id="signup-messages"></div>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password (min 6 characters)" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit">Create Account</button>
+                <button type="button" class="toggle-btn" onclick="toggleForms()">Already have an account? Sign in</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="main-dashboard" class="main-container hidden">
+        <div class="user-info">
+            <span>👋 Welcome, <strong id="user-name"></strong>!</span>
+            <button class="logout-btn" onclick="logout()">Sign Out</button>
+        </div>
+        
+        <div class="logo">
+            <h1>BARNI SAN</h1>
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 30px; font-weight: 600;">🌐 Global Cloud Drive</h2>
+        
+        <!-- Upload Area -->
+        <div class="upload-area" id="upload-area">
+            <div class="upload-icon">☁️</div>
+            <div class="upload-text">Drag & Drop files here</div>
+            <div class="upload-subtitle">
+                Upload any file type to your global cloud storage<br>
+                Maximum file size: 100MB • Get instant global share links
+            </div>
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()">Choose Files</button>
+            <input type="file" id="file-input" class="file-input" multiple accept="*/*">
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-container" class="progress-container hidden">
+            <div class="progress-bar" id="progress-bar"></div>
+            <div class="progress-text" id="progress-text">Uploading...</div>
+        </div>
+
+        <!-- Files List -->
+        <div id="files-list">
+            <!-- Files will be displayed here -->
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtEz6RLQz3SeRTkEMq3P5tMOawfHEItEY",
+            authDomain: "uploadanddownload-cd28d.firebaseapp.com",
+            projectId: "uploadanddownload-cd28d",
+            storageBucket: "uploadanddownload-cd28d.firebasestorage.app",
+            messagingSenderId: "992720936493",
+            appId: "1:992720936493:web:fb24e1350156ed73c5a2a4",
+            measurementId: "G-NHC0MHDTXP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.auth = auth;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.updateProfile = updateProfile;
+        window.currentUser = null;
+        window.userFiles = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('main-dashboard').classList.remove('hidden');
+                document.getElementById('user-name').textContent = user.displayName || user.email;
+                
+                setTimeout(async () => {
+                    await loadUserFiles();
+                }, 1000);
+                
+            } else {
+                window.currentUser = null;
+                window.userFiles = [];
+                
+                const isSharedFile = await checkSharedAccess();
+                if (!isSharedFile) {
+                    document.getElementById('main-dashboard').classList.add('hidden');
+                    document.getElementById('auth-container').classList.remove('hidden');
+                }
+                
+                document.getElementById('loginForm').reset();
+                document.getElementById('signupForm').reset();
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('signup-form').classList.add('hidden');
+                clearMessages();
+            }
+        });
+
+        console.log('✅ Firebase initialized');
+    </script>
+
+    <!-- Supabase SDK -->
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js'
+
+        const supabaseUrl = 'https://wcoupplakfuzkkzqmmid.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjb3VwcGxha2Z1emtrenFtbWlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODg0ODUyMiwiZXhwIjoyMDY0NDI0NTIyfQ.iPrvKT0Qb1A127ZbX-_Fp3R7O42q9J1gBUuMihwD0bs'
+        
+        const supabase = createClient(supabaseUrl, supabaseKey)
+        window.supabase = supabase;
+
+        console.log('✅ Supabase initialized');
+    </script>
+
+    <!-- Main Application Script -->
+    <script>
+        const BASE_DOMAIN = 'https://barnigonz.github.io/BarniWebCloud';
+        const BUCKET_NAME = 'user-files';
+        const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+        // Download tracking variables
+        let currentDownload = null;
+        let downloadStartTime = 0;
+        let downloadedBytes = 0;
+
+        // Utility Functions
+        function showMessage(message, type = 'info', elementId = null) {
+            const messageDiv = `<div class="${type}-message message">${message}</div>`;
+            if (elementId) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = messageDiv;
+                    setTimeout(() => {
+                        element.innerHTML = '';
+                    }, type === 'error' ? 7000 : 4000);
+                }
+            }
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('login-messages').innerHTML = '';
+            document.getElementById('signup-messages').innerHTML = '';
+        }
+
+        function generateShareKey() {
+            return Math.random().toString(36).substr(2, 8).toUpperCase();
+        }
+
+        function getFileIcon(type) {
+            if (!type) return '📄';
+            if (type.startsWith('image/')) return '🖼️';
+            if (type.startsWith('video/')) return '🎥';
+            if (type.startsWith('audio/')) return '🎵';
+            if (type.includes('pdf')) return '📄';
+            if (type.includes('word') || type.includes('document')) return '📝';
+            if (type.includes('excel') || type.includes('spreadsheet')) return '📊';
+            if (type.includes('zip') || type.includes('rar')) return '📦';
+            if (type.includes('text')) return '📄';
+            return '📁';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function formatSpeed(bytesPerSecond) {
+            if (bytesPerSecond === 0) return '0 KB/s';
+            const k = 1024;
+            const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+            const i = Math.floor(Math.log(bytesPerSecond) / Math.log(k));
+            return parseFloat((bytesPerSecond / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || seconds === Infinity) return 'Calculating...';
+            if (seconds < 60) return `${Math.round(seconds)}s`;
+            if (seconds < 3600) return `${Math.round(seconds / 60)}m ${Math.round(seconds % 60)}s`;
+            return `${Math.round(seconds / 3600)}h ${Math.round((seconds % 3600) / 60)}m`;
+        }
+
+        function getErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/email-already-in-use':
+                    return 'Email is already registered. Please use a different email.';
+                case 'auth/weak-password':
+                    return 'Password is too weak. Please use at least 6 characters.';
+                case 'auth/invalid-email':
+                    return 'Invalid email address format.';
+                case 'auth/user-not-found':
+                    return 'No account found with this email address.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password. Please try again.';
+                case 'auth/too-many-requests':
+                    return 'Too many failed attempts. Please try again later.';
+                case 'auth/invalid-credential':
+                    return 'Invalid email or password. Please check your credentials.';
+                default:
+                    return 'An error occurred. Please try again.';
+            }
+        }
+
+        // Advanced Download Functions
+        function showDownloadProgress(filename, fileSize) {
+            const overlay = document.getElementById('download-progress-overlay');
+            const icon = document.getElementById('download-modal-icon');
+            const filenameEl = document.getElementById('download-modal-filename');
+            const details = document.getElementById('download-modal-details');
+            const progress = document.getElementById('download-modal-progress');
+            const speed = document.getElementById('download-modal-speed');
+            const percentage = document.getElementById('download-modal-percentage');
+            const eta = document.getElementById('download-modal-eta');
+
+            // Set initial values
+            icon.textContent = getFileIcon('');
+            filenameEl.textContent = filename;
+            details.innerHTML = `File size: ${formatFileSize(fileSize)}<br>Starting download...`;
+            progress.style.width = '0%';
+            speed.textContent = '0 KB/s';
+            percentage.textContent = '0%';
+            eta.textContent = 'Calculating...';
+
+            // Show overlay
+            overlay.classList.remove('hidden');
+            
+            // Reset tracking variables
+            downloadStartTime = Date.now();
+            downloadedBytes = 0;
+        }
+
+        function updateDownloadProgress(loaded, total) {
+            const progress = document.getElementById('download-modal-progress');
+            const speed = document.getElementById('download-modal-speed');
+            const percentage = document.getElementById('download-modal-percentage');
+            const eta = document.getElementById('download-modal-eta');
+            const details = document.getElementById('download-modal-details');
+
+            const percent = Math.round((loaded / total) * 100);
+            const elapsed = (Date.now() - downloadStartTime) / 1000;
+            const bytesPerSecond = elapsed > 0 ? loaded / elapsed : 0;
+            const remainingBytes = total - loaded;
+            const estimatedTimeRemaining = bytesPerSecond > 0 ? remainingBytes / bytesPerSecond : 0;
+
+            // Update UI
+            progress.style.width = percent + '%';
+            percentage.textContent = percent + '%';
+            speed.textContent = formatSpeed(bytesPerSecond);
+            eta.textContent = formatTime(estimatedTimeRemaining);
+            
+            details.innerHTML = `
+                Downloaded: ${formatFileSize(loaded)} / ${formatFileSize(total)}<br>
+                <span style="color: #4ecdc4;">⚡ High-speed download in progress...</span>
+            `;
+
+            downloadedBytes = loaded;
+        }
+
+        function hideDownloadProgress() {
+            const overlay = document.getElementById('download-progress-overlay');
+            overlay.classList.add('hidden');
+            currentDownload = null;
+        }
+
+        function cancelDownload() {
+            if (currentDownload) {
+                currentDownload.abort();
+                currentDownload = null;
+            }
+            hideDownloadProgress();
+            showMessage('❌ Download cancelled', 'error');
+        }
+
+        async function downloadFileWithProgress(url, filename, fileSize = 0) {
+            try {
+                // Show progress modal
+                showDownloadProgress(filename, fileSize);
+
+                // Create AbortController for cancellation
+                const controller = new AbortController();
+                currentDownload = controller;
+
+                console.log('📥 Starting advanced download:', filename);
+
+                // Fetch with progress tracking
+                const response = await fetch(url, {
+                    signal: controller.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+                }
+
+                // Get actual file size from response
+                const contentLength = response.headers.get('content-length');
+                const totalSize = contentLength ? parseInt(contentLength) : fileSize;
+
+                // Create readable stream with progress tracking
+                const reader = response.body.getReader();
+                const chunks = [];
+                let receivedLength = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (done) break;
+
+                    chunks.push(value);
+                    receivedLength += value.length;
+
+                    // Update progress
+                    updateDownloadProgress(receivedLength, totalSize);
+                }
+
+                // Create blob and download
+                const blob = new Blob(chunks);
+                const downloadUrl = URL.createObjectURL(blob);
+
+                // Create download link
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Cleanup
+                URL.revokeObjectURL(downloadUrl);
+
+                // Show completion
+                setTimeout(() => {
+                    hideDownloadProgress();
+                    showMessage(`🎉 Download completed: ${filename}`, 'success');
+                }, 1000);
+
+                console.log('✅ Download completed:', filename);
+
+            } catch (error) {
+                hideDownloadProgress();
+                
+                if (error.name === 'AbortError') {
+                    console.log('Download cancelled by user');
+                } else {
+                    console.error('Download error:', error);
+                    showMessage(`❌ Download failed: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Authentication Functions
+        async function signUpUser(name, email, password) {
+            try {
+                showLoading('signup-messages');
+                
+                const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                const user = userCredential.user;
+                
+                await window.updateProfile(user, {
+                    displayName: name
+                });
+                
+                // Create user record in Supabase
+                await window.supabase
+                    .from('users')
+                    .insert([{
+                        firebase_uid: user.uid,
+                        email: email,
+                        display_name: name
+                    }]);
+                
+                showMessage('🎉 Account created successfully! Welcome to BARNI SAN!', 'success', 'signup-messages');
+                
+            } catch (error) {
+                showMessage(getErrorMessage(error.code), 'error', 'signup-messages');
+                console.error('Signup error:', error);
+            }
+        }
+
+        async function signInUser(email, password) {
+            try {
+                showLoading('login-messages');
+                
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+                showMessage('✅ Login successful! Welcome back!', 'success', 'login-messages');
+                
+            } catch (error) {
+                showMessage(getErrorMessage(error.code), 'error', 'login-messages');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function signOutUser() {
+            try {
+                await window.signOut(window.auth);
+                showMessage('👋 Logged out successfully!', 'success');
+            } catch (error) {
+                showMessage('Error signing out: ' + error.message, 'error');
+            }
+        }
+
+        // File Upload Functions
+        async function uploadToSupabase(file) {
+            try {
+                if (!window.currentUser) {
+                    throw new Error('User not authenticated');
+                }
+
+                if (file.size > MAX_FILE_SIZE) {
+                    throw new Error(`File size exceeds 100MB limit. File size: ${formatFileSize(file.size)}`);
+                }
+
+                const timestamp = Date.now();
+                const randomId = Math.random().toString(36).substr(2, 9);
+                const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const fileName = `${timestamp}_${randomId}_${sanitizedFileName}`;
+                const filePath = `${window.currentUser.uid}/${fileName}`;
+
+                console.log('📤 Uploading to Supabase:', fileName);
+
+                const { data, error } = await window.supabase.storage
+                    .from(BUCKET_NAME)
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) {
+                    console.error('Supabase upload error:', error);
+                    throw new Error(`Upload failed: ${error.message}`);
+                }
+
+                const { data: { publicUrl } } = window.supabase.storage
+                    .from(BUCKET_NAME)
+                    .getPublicUrl(filePath);
+
+                console.log('✅ Upload successful:', fileName);
+
+                return {
+                    success: true,
+                    data: {
+                        path: filePath,
+                        publicUrl: publicUrl,
+                        fileName: fileName
+                    }
+                };
+            } catch (error) {
+                console.error('Upload error:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function saveFileMetadata(fileData) {
+            try {
+                if (!window.currentUser) {
+                    throw new Error('User not authenticated');
+                }
+
+                console.log('💾 Saving file metadata:', fileData.file_name);
+
+                const { data, error } = await window.supabase
+                    .from('files')
+                    .insert([fileData])
+                    .select()
+                    .single();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ File metadata saved with ID:', data.id);
+                return data;
+                
+            } catch (error) {
+                console.error('Error saving file metadata:', error);
+                throw error;
+            }
+        }
+
+        async function handleFileUpload(files) {
+            if (!window.currentUser) {
+                showMessage('Please log in first to upload files', 'error');
+                return;
+            }
+
+            console.log(`📤 Starting upload of ${files.length} files`);
+
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            progressContainer.classList.remove('hidden');
+            
+            try {
+                let successCount = 0;
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    const progress = (i / files.length) * 100;
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `Uploading ${file.name}... (${i + 1}/${files.length})`;
+                    
+                    try {
+                        const uploadResult = await uploadToSupabase(file);
+                        
+                        if (uploadResult.success) {
+                            const shareKey = generateShareKey();
+                            
+                            const fileData = {
+                                user_id: window.currentUser.uid,
+                                file_name: file.name,
+                                file_size: file.size,
+                                file_type: file.type,
+                                storage_path: uploadResult.data.path,
+                                download_url: uploadResult.data.publicUrl,
+                                share_key: shareKey,
+                                is_shared: true,
+                                download_count: 0
+                            };
+                            
+                            const savedFile = await saveFileMetadata(fileData);
+                            
+                            successCount++;
+                            console.log(`✅ Successfully uploaded: ${file.name}`);
+                            
+                        } else {
+                            throw new Error(uploadResult.error);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`❌ Upload failed for: ${file.name}`, error);
+                        showMessage(`Failed to upload "${file.name}": ${error.message}`, 'error');
+                    }
+                    
+                    progressBar.style.width = ((i + 1) / files.length) * 100 + '%';
+                }
+                
+                if (successCount > 0) {
+                    showMessage(`🎉 Successfully uploaded ${successCount} file(s)!`, 'success');
+                    
+                    setTimeout(async () => {
+                        await loadUserFiles();
+                    }, 1000);
+                } else {
+                    showMessage('❌ No files were uploaded successfully', 'error');
+                }
+                
+            } catch (error) {
+                showMessage('Upload error: ' + error.message, 'error');
+                console.error('Upload error:', error);
+            } finally {
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Uploading...';
+                }, 1500);
+            }
+        }
+
+        // File Management Functions
+        async function loadUserFiles() {
+            try {
+                if (!window.currentUser) {
+                    console.warn('No user logged in');
+                    return;
+                }
+
+                console.log('📂 Loading user files...');
+                showLoading('files-list');
+
+                const { data: files, error } = await window.supabase
+                    .from('files')
+                    .select('*')
+                    .eq('user_id', window.currentUser.uid)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                window.userFiles = files || [];
+                console.log(`✅ Loaded ${window.userFiles.length} files`);
+                
+                displayFiles();
+                
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showMessage('Error loading files: ' + error.message, 'error');
+            }
+        }
+
+        function displayFiles() {
+            const filesList = document.getElementById('files-list');
+            
+            if (!window.userFiles || window.userFiles.length === 0) {
+                filesList.innerHTML = '<div style="text-align: center; padding: 50px; color: rgba(255,255,255,0.7);"><h3>📁 No files yet</h3><p>Upload some files to get started!</p></div>';
+                return;
+            }
+            
+            filesList.innerHTML = window.userFiles.map(file => {
+                const shareLink = `${BASE_DOMAIN}?share=${file.share_key}`;
+                
+                return `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon">${getFileIcon(file.file_type)}</div>
+                            <div class="file-details">
+                                <div class="file-name">${file.file_name}</div>
+                                <div class="file-meta">
+                                    ${formatFileSize(file.file_size)} • ${formatDate(file.created_at)}
+                                    <br><span style="color: #4ecdc4;">🌐 Globally Shared</span>
+                                    <br><small>Downloads: ${file.download_count}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="share-link-container">
+                            <strong>🔗 Global Share Link:</strong>
+                            <div class="share-link">${shareLink}</div>
+                            <div class="action-buttons">
+                                <button class="action-btn download-btn" id="download-btn-${file.id}" onclick="downloadFile('${file.download_url}', '${file.file_name}', ${file.file_size})">📥 Download</button>
+                                <button class="action-btn copy-btn" onclick="copyToClipboard('${shareLink}')">📋 Copy Link</button>
+                                <button class="action-btn delete-btn" onclick="deleteFile('${file.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function downloadFile(url, filename, fileSize = 0) {
+            try {
+                // Find and update button state
+                const buttons = document.querySelectorAll('.download-btn');
+                buttons.forEach(btn => {
+                    if (btn.textContent.includes('Download')) {
+                        btn.classList.add('downloading');
+                        btn.textContent = '⏳ Downloading...';
+                        btn.disabled = true;
+                    }
+                });
+
+                // Start advanced download with progress
+                await downloadFileWithProgress(url, filename, fileSize);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showMessage('Error downloading file: ' + error.message, 'error');
+            } finally {
+                // Reset button states
+                setTimeout(() => {
+                    const buttons = document.querySelectorAll('.download-btn');
+                    buttons.forEach(btn => {
+                        btn.classList.remove('downloading');
+                        btn.textContent = '📥 Download';
+                        btn.disabled = false;
+                    });
+                }, 2000);
+            }
+        }
+
+        async function deleteFile(fileId) {
+            if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const file = window.userFiles.find(f => f.id === fileId);
+                if (!file) {
+                    showMessage('File not found', 'error');
+                    return;
+                }
+
+                console.log('🗑️ Deleting file:', file.file_name);
+
+                // Delete from Supabase storage
+                if (file.storage_path) {
+                    try {
+                        const { error: storageError } = await window.supabase.storage
+                            .from(BUCKET_NAME)
+                            .remove([file.storage_path]);
+                        
+                        if (storageError) {
+                            console.warn('Supabase storage deletion warning:', storageError);
+                        } else {
+                            console.log('✅ File deleted from Supabase storage');
+                        }
+                    } catch (storageError) {
+                        console.warn('File not found in Supabase storage:', storageError);
+                    }
+                }
+                
+                // Delete from database
+                const { error } = await window.supabase
+                    .from('files')
+                    .delete()
+                    .eq('id', fileId);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ File metadata deleted from database');
+                
+                // Update local array
+                window.userFiles = window.userFiles.filter(f => f.id !== fileId);
+                
+                showMessage(`🗑️ File deleted successfully: ${file.file_name}`, 'success');
+                displayFiles();
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                showMessage('Error deleting file: ' + error.message, 'error');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('🔗 Link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showMessage('🔗 Link copied to clipboard!', 'success');
+            });
+        }
+
+        // Shared File Access
+        async function checkSharedAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareKey = urlParams.get('share');
+            
+            if (shareKey) {
+                try {
+                    document.getElementById('auth-container').classList.add('hidden');
+                    document.getElementById('main-dashboard').classList.add('hidden');
+                    document.getElementById('shared-file-page').classList.remove('hidden');
+                    
+                    document.getElementById('shared-file-content').innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading shared file...
+                        </div>
+                    `;
+                    
+                    const { data: file, error } = await window.supabase
+                        .from('files')
+                        .select('*')
+                        .eq('share_key', shareKey)
+                        .single();
+                    
+                    if (error || !file) {
+                        document.getElementById('shared-file-content').innerHTML = `
+                            <div class="shared-file-icon">❌</div>
+                            <div class="shared-file-name">File Not Found</div>
+                            <div class="shared-file-details">
+                                The shared file could not be found or may have been deleted.<br>
+                                Share Key: ${shareKey}<br>
+                                <small style="color: rgba(255,255,255,0.7);">Please check the link or contact the person who shared this file.</small>
+                            </div>
+                            <a href="${BASE_DOMAIN}" class="back-to-app-btn">
+                                🏠 Go to BARNI SAN
+                            </a>
+                        `;
+                        return true;
+                    }
+                    
+                    // Update download count
+                    try {
+                        await window.supabase
+                            .from('files')
+                            .update({ download_count: file.download_count + 1 })
+                            .eq('id', file.id);
+                    } catch (updateError) {
+                        console.warn('Could not update download count:', updateError);
+                    }
+                    
+                    document.getElementById('shared-file-content').innerHTML = `
+                        <div class="shared-file-icon">${getFileIcon(file.file_type)}</div>
+                        <div class="shared-file-name">${file.file_name}</div>
+                        <div class="shared-file-details">
+                            File size: ${formatFileSize(file.file_size)}<br>
+                            Shared via BARNI SAN Global Cloud Drive<br>
+                            <span style="color: #4ecdc4;">🌐 Globally accessible worldwide</span><br>
+                            <small style="color: rgba(255,255,255,0.7);">Share Key: ${shareKey} • Downloaded ${file.download_count} times</small>
+                        </div>
+                        <button class="download-shared-btn" id="shared-download-btn" onclick="downloadSharedFile('${file.download_url}', '${file.file_name}', ${file.file_size})">
+                            📥 Download File
+                        </button>
+                        <a href="${BASE_DOMAIN}" class="back-to-app-btn">
+                            🏠 Go to BARNI SAN
+                        </a>
+                    `;
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Error checking shared access:', error);
+                    document.getElementById('shared-file-content').innerHTML = `
+                        <div class="shared-file-icon">⚠️</div>
+                        <div class="shared-file-name">Error Loading File</div>
+                        <div class="shared-file-details">
+                            An error occurred while loading the shared file.<br>
+                            <small style="color: rgba(255,255,255,0.7);">Please try again later or contact support.</small>
+                        </div>
+                        <a href="${BASE_DOMAIN}" class="back-to-app-btn">
+                            🏠 Go to BARNI SAN
+                        </a>
+                    `;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        async function downloadSharedFile(url, filename, fileSize = 0) {
+            try {
+                // Update button state
+                const btn = document.getElementById('shared-download-btn');
+                if (btn) {
+                    btn.textContent = '⏳ Downloading...';
+                    btn.disabled = true;
+                }
+
+                // Start advanced download with progress
+                await downloadFileWithProgress(url, filename, fileSize);
+                
+            } catch (error) {
+                console.error('Shared download error:', error);
+                showMessage('Error downloading file: ' + error.message, 'error');
+            } finally {
+                // Reset button state
+                setTimeout(() => {
+                    const btn = document.getElementById('shared-download-btn');
+                    if (btn) {
+                        btn.textContent = '📥 Download File';
+                        btn.disabled = false;
+                    }
+                }, 2000);
+            }
+        }
+
+        // UI Functions
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            
+            if (loginForm.classList.contains('hidden')) {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+            }
+            
+            clearMessages();
+        }
+
+        function logout() {
+            signOutUser();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 BARNI SAN Global Cloud Drive initialized');
+            
+            // Form submissions
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                signInUser(email, password);
+            });
+
+            document.getElementById('signupForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm').value;
+                
+                if (password !== confirmPassword) {
+                    showMessage('Passwords do not match!', 'error', 'signup-messages');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showMessage('Password must be at least 6 characters long!', 'error', 'signup-messages');
+                    return;
+                }
+                
+                signUpUser(name, email, password);
+            });
+
+            // File upload
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    handleFileUpload(files);
+                }
+                e.target.value = '';
+            });
+
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                    handleFileUpload(files);
+                }
+            });
+
+            // Check for shared file access
+            checkSharedAccess();
+        });
+
+        // Global function declarations
+        window.toggleForms = toggleForms;
+        window.logout = logout;
+        window.downloadFile = downloadFile;
+        window.deleteFile = deleteFile;
+        window.copyToClipboard = copyToClipboard;
+        window.downloadSharedFile = downloadSharedFile;
+        window.cancelDownload = cancelDownload;
+
+        console.log('✅ BARNI SAN Global Cloud Drive fully loaded and ready!');
+    </script>
+</body>
+</html>
